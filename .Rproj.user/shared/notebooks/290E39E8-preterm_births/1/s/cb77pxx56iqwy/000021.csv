@@ -1,0 +1,50 @@
+"0","births<- births %>% "
+"0","  separate(parity,into = c('prev_term','prev_pre_term'),sep = '[+]') %>% "
+"0","  mutate(birth_weight=case_when("
+"0","    birth_weight>=2500 & birth_weight<=3000~'2500-3000g',"
+"0","    birth_weight>3000~'>3000g',"
+"0","    birth_weight<2500~'<2500g',"
+"0","    TRUE~birth_weight"
+"0","  ),"
+"0","  education=str_to_title(education),"
+"0","  birth_weight=str_replace(birth_weight,'g',''),"
+"0","  birth_weight=factor(birth_weight,"
+"0","                            levels=c('<2500','2500-3000','>3000')),"
+"0","  gestational_age=as.numeric(str_replace_all(gestational_age,'weeks','')),"
+"0","  across(.cols = c(occupation,education),.fns = ~str_to_title(.)),"
+"0","  occupation=str_replace_all(occupation,'Self Employed','Self-Employed'),"
+"0","  mode_of_delivery=if_else(mode_of_delivery=='Ceserian','Caesarean section',mode_of_delivery),"
+"0","  mode_of_delivery="
+"0","    if_else(mode_of_delivery%in%c('Assisted delivery','Spontaneous Vertex Delivery'),'Spontaneous Vertex Delivery','Caesarean section'),"
+"0","  nature=if_else(gestational_age>24&gestational_age<37,'Pre-term','Term'),"
+"0","  across(where(is.character),as_factor)"
+"0","  )"
+"0","births %>% glimpse()"
+"1","Rows: 141"
+"1",""
+"1","
+"
+"1","Columns: 17"
+"1",""
+"1","
+"
+"1","$ mother_age       [3m[38;5;246m<dbl>[39m[23m 32, 22, 22, 22, 22, 24, 30, 31, 33, 18, …
+$ education        [3m[38;5;246m<fct>[39m[23m Secondary, Secondary, Secondary, Seconda…
+$ marital_status   [3m[38;5;246m<fct>[39m[23m Married, Married, Married, Married, Marr…
+$ occupation       [3m[38;5;246m<fct>[39m[23m Self-Employed, Self-Employed, Stay At Ho…
+$ prev_term        [3m[38;5;246m<fct>[39m[23m 4, 1, 2, 1, 2, 0, 2, 3, 3, 1, 0, 3, 2, 3…
+$ prev_pre_term    [3m[38;5;246m<fct>[39m[23m 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0…
+$ gestational_age  [3m[38;5;246m<dbl>[39m[23m 31, 36, 28, 34, 28, 36, 34, 33, 35, 32, …
+$ complication     [3m[38;5;246m<fct>[39m[23m No, No, No, No, Yes, Yes, No, No, No, Ye…
+$ mode_of_delivery [3m[38;5;246m<fct>[39m[23m Caesarean section, Caesarean section, Ca…
+$ onset_of_labor   [3m[38;5;246m<fct>[39m[23m Spontaneous, Spontaneous, Induced, Induc…
+$ anc_visits       [3m[38;5;246m<dbl>[39m[23m 3, 3, 3, 3, 3, 4, 3, 2, 2, 3, 3, 3, 3, 3…
+$ HIV              [3m[38;5;246m<fct>[39m[23m Reactive, Non-Reactive, Non-Reactive, No…
+$ blood_group      [3m[38;5;246m<fct>[39m[23m O, B, A, O, A, B, O, O, O, B, O, O, A, B…
+$ rhesus           [3m[38;5;246m<fct>[39m[23m Positive, Negative, Positive, Negative, …
+$ sex              [3m[38;5;246m<fct>[39m[23m Female, Female, Male, Female, Male, Male…
+$ birth_weight     [3m[38;5;246m<fct>[39m[23m <2500, <2500, <2500, 2500-3000, <2500, 2…
+$ nature           [3m[38;5;246m<fct>[39m[23m Pre-term, Pre-term, Pre-term, Pre-term, …"
+"1",""
+"1","
+"

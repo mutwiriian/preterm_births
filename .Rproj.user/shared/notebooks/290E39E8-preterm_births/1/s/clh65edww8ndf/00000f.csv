@@ -1,0 +1,5 @@
+"0","births %>% "
+"0","  select(nature,mother_age) %>% "
+"0","  tbl_summary(by=nature,"
+"0","              label=list(mother_age=""Mother's Age"")) %>% "
+"0","  add_p()"

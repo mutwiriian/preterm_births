@@ -1,0 +1,5 @@
+"0","births %>% "
+"0","  ggplot(aes(complication,fill=complication))+"
+"0","  geom_bar(show.legend = F)+"
+"0","  scale_fill_manual(values = color_pal)+"
+"0","  labs(x='Complication?',y='Frequency')"

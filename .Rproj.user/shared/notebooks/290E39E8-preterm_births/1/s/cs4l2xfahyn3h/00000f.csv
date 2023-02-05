@@ -1,0 +1,5 @@
+"0","births %>% "
+"0","  select(nature,onset_of_labor) %>% "
+"0","  filter(onset_of_labor!='Unknown') %>% "
+"0","  tbl_summary(by=nature,label = list(onset_of_labor='Onset of Labor')) %>% "
+"0","  add_p()"

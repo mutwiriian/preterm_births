@@ -1,0 +1,301 @@
+---
+title: "births"
+format: docx
+editor: visual
+date: now
+execute: 
+  echo: false
+  warning: false
+  cache: true
+---
+
+```{r}
+library(tidyverse)
+library(gt)
+library(gtsummary)
+
+births <- readxl::read_xlsx('births.xlsx',
+                            na = c('','not indicated','Not Indicated',
+                                   'not Indicated','Unkown','Not indicated'))
+color_pal <- RColorBrewer::brewer.pal(7,'Dark2')
+theme_set(theme_bw())
+```
+
+Brief overview of variables measured:
+
+17 variables were measured across 141 patients.
+
+```{r}
+births<- births %>% 
+  separate(parity,into = c('prev_term','prev_pre_term'),sep = '[+]') %>% 
+  mutate(birth_weight=case_when(
+    birth_weight>=2500 & birth_weight<=3000~'2500-3000g',
+    birth_weight>3000~'>3000g',
+    birth_weight<2500~'<2500g',
+    TRUE~birth_weight
+  ),
+  education=str_to_title(education),
+  birth_weight=str_replace(birth_weight,'g',''),
+  birth_weight=factor(birth_weight,
+                            levels=c('<2500','2500-3000','>3000')),
+  gestational_age=as.numeric(str_replace_all(gestational_age,'weeks','')),
+  across(.cols = c(occupation,education),.fns = ~str_to_title(.)),
+  occupation=str_replace_all(occupation,'Self Employed','Self-Employed'),
+  mode_of_delivery=if_else(mode_of_delivery=='Ceserian','Caesarean section',mode_of_delivery),
+  mode_of_delivery=
+    if_else(mode_of_delivery%in%c('Assisted delivery','Spontaneous Vertex Delivery'),'Spontaneous Vertex Delivery','Caesarean section'),
+  nature=if_else(gestational_age>24&gestational_age<37,'Pre-term','Term'),
+  across(where(is.character),as_factor)
+  )
+births %>% glimpse()
+```
+
+Overall age is somewhat evenly distributed
+
+```{r}
+births %>% 
+  ggplot(aes(mother_age)) +
+  geom_histogram(bins = 20,fill='midnightblue',color='white')+
+  labs(x="Mother's age",y='Count',title = "Histogram of mothers' age")
+```
+
+```{r}
+births %>% 
+  ggplot(aes(mother_age)) +
+  geom_histogram(bins = 20,fill='midnightblue',color='white')+
+  facet_wrap(~nature)+
+  labs(x="Mother's age",y='Count',title = "Histogram of mothers' age")
+```
+
+Level of education was missing for a significant number of the interviewed mothers. A few made it to university while most had completed secondary school.
+
+```{r}
+births %>% 
+    select(nature,education) %>% 
+    group_by(nature,education) %>% 
+    summarise(n=n()) %>% 
+    ggplot(aes(reorder(education,n),n))+
+    geom_col(aes(fill=education),show.legend = F)+
+    scale_fill_manual(values = color_pal)+
+    facet_wrap(~nature)+
+    labs(y='Count',x='Educational attainment')+
+    coord_flip()
+```
+
+More mothers were married.
+
+```{r}
+#/ warning: false
+births %>% 
+  ggplot(aes(marital_status))+
+  geom_bar(aes(fill=marital_status))+
+  scale_fill_manual(values = color_pal)+
+  labs(x='Marital Status',y='Count')
+```
+
+Among mothers who reported, most were stay at home moms, followed by the self-employed and employed.
+
+```{r}
+births %>% 
+  group_by(nature,occupation) %>% 
+  ggplot(aes(occupation,fill=occupation))+
+  geom_bar(show.legend = F)+
+  scale_fill_manual(values = color_pal)+
+  coord_flip()+
+  facet_wrap(~nature)+
+  labs(y='Count',x='Occupation')
+```
+
+A significant number of mothers were in the mid to late thirties.
+
+```{r}
+births %>% 
+  ggplot(aes(gestational_age))+
+  geom_histogram(bins=10,fill='midnightblue',color='white')+
+  labs(x='Gestational age',y='Frequency')
+```
+
+```{r}
+births %>% 
+  ggplot(aes(gestational_age))+
+  geom_boxplot()+
+  labs(x='Gestational Age')
+```
+
+There were more births that had complications
+
+```{r}
+births %>% 
+  ggplot(aes(complication,fill=complication))+
+  geom_bar(show.legend = F)+
+  scale_fill_manual(values = color_pal)+
+  labs(x='Complication?',y='Frequency')
+```
+
+Onset of labor for most mothers was spontaneous
+
+```{r}
+births %>% 
+  select(nature,onset_of_labor) %>% 
+  na.omit() %>% 
+  ggplot(aes(onset_of_labor))+
+  geom_bar(aes(fill=onset_of_labor),show.legend = F)+
+  scale_fill_manual(values = color_pal)+
+  facet_wrap(~nature)+
+  labs(x='Onset of labor')
+```
+
+Complications were common among women with induced on set of labor (59%) compared to those who had spontaneous onset of labor(40%)
+
+```{r}
+births %>% 
+  select(onset_of_labor,complication) %>% 
+  group_by(onset_of_labor) %>% 
+  count(complication) %>% 
+  mutate(prop=n/sum(n)) %>% 
+  ggplot(aes(reorder(onset_of_labor,-n),n))+
+  geom_col(aes(fill=complication))+
+  geom_text(data = . %>% filter(onset_of_labor=='Spontaneous'),
+            aes(label=n),vjust=2)+
+  annotate(x='Induced',y=22,geom = 'text',label=17)+
+  scale_fill_manual(values = color_pal,name='Complication?')+
+  labs(x='Onset of labor',y='Frequency')
+```
+
+Moreover, most of the pre-term and term births were by Caesarian Section . No pre-term births reported were by spontaneous vertex delivery.
+
+```{r}
+births %>% 
+  select(nature,mode_of_delivery) %>% 
+  group_by(nature,mode_of_delivery)%>%
+  summarise(n=n()) %>% 
+  na.omit() %>% 
+  ggplot(aes(x=reorder(mode_of_delivery,n),y=n))+
+  geom_col(aes(fill=mode_of_delivery),show.legend = F)+
+  #coord_flip()+
+  scale_fill_manual(values = color_pal)+
+  scale_x_discrete(
+    labels = c('Spontaneous Vertex\nDelivery','Cesarian Section'))+
+  facet_wrap(~nature)+
+  labs(x='Mode of Delivery')
+```
+
+A majority of deliveries were spontaneous for term and pre-term births
+
+```{r}
+births %>% 
+  select(nature,onset_of_labor) %>% 
+  filter(onset_of_labor!='Unknown') %>% 
+  ggplot(aes(nature,fill=onset_of_labor))+
+  geom_bar()+
+  scale_fill_manual(values = color_pal)+
+  labs(x='')
+```
+
+For the interviewed mothers, the were more male newborns than female newborns.
+
+```{r}
+births %>% 
+  ggplot(aes(sex,fill=sex))+
+  geom_bar()+
+  scale_fill_manual(values = color_pal)+
+  labs(x='',y='Count')
+```
+
+Most new borns weighed less than 2500 grams compared 17 who weighed more than 3000 grams
+
+```{r}
+births %>% 
+  count(birth_weight) %>% 
+  ggplot(aes(x=birth_weight,y=n,fill=birth_weight))+
+  geom_col()+
+  geom_text(aes(label=n),vjust=-.6)+
+  scale_fill_manual(values = color_pal)+
+  ylim(c(0,90))+
+  labs(x='Birth Weight',y='Frequency')
+```
+
+However, differences in weight across male and female newborns are not significant
+
+```{r}
+births %>% 
+  select(nature,birth_weight) %>% 
+  tbl_summary(by=nature,label=list(birth_weight='Birth Weight')) %>% 
+  add_p()
+```
+
+The distribution across both sexes of the newborns is almost similar for both pre-term and term births.
+
+```{r}
+births %>% 
+  ggplot(aes(nature,fill=sex))+
+  geom_bar()+
+  scale_fill_manual(values = color_pal)+
+  labs(x='',y='Count')
+```
+
+```{r}
+ttt_ifas <- readxl::read_xlsx('factors.xlsx') %>% 
+  select('Tetanus Toxoid','IFAS','Hb')
+```
+
+```{r}
+ttt_ifas %>% 
+  mutate(Hb=as.numeric(Hb))%>% 
+  summarise(N=n(),
+            Average=mean(Hb,na.rm=T)) %>% 
+  gt() %>% 
+  tab_header(title = 'Hb levels reported')
+```
+
+There is a significant association between the number of antenatal clinic visits
+
+```{r}
+births %>% 
+  select(nature,anc_visits) %>% 
+  mutate(anc_visits=as_factor(anc_visits)) %>% 
+  filter(anc_visits!='Unknown',nature!='Unknown') %>% 
+  tbl_summary(by=nature,label=list(anc_visits='Clinic Visits')) %>% 
+  add_p()
+```
+
+Mother's age is not a risk factor influencing the occurrence of term and pre-term births in the sample considered.
+
+```{r}
+births %>% 
+  select(nature,mother_age) %>% 
+  tbl_summary(by=nature,
+              label=list(mother_age="Mother's Age")) %>% 
+  add_p()
+```
+
+```{r}
+births %>% 
+  select(nature,onset_of_labor) %>% 
+  filter(onset_of_labor!='Unknown') %>% 
+  tbl_summary(by=nature,label = list(onset_of_labor='Onset of Labor')) %>% 
+  add_p()
+```
+
+There is close association between complications and the mode of delivery.
+
+```{r}
+births %>% 
+  select(mode_of_delivery,complication) %>% 
+  tbl_summary(by=complication,
+              label = list(mode_of_delivery~'Mode of Delivery')) %>% 
+  add_p() %>% 
+  as_gt() %>% 
+  tab_header(title = md('**Complication?**'))
+  
+```
+
+Mode of delivery is a highly significant risk factor influencing the occurrence of term and pre-term births as confirmed by a Chi-squared test.
+
+```{r}
+births %>% 
+  select(mode_of_delivery,nature) %>% 
+  tbl_summary(by=nature,
+              label = list(mode_of_delivery~'Mode of Delivery')) %>% 
+  add_p()
+```

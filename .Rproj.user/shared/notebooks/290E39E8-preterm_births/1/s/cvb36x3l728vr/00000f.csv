@@ -1,0 +1,7 @@
+"0","births %>% "
+"0","  select(nature,onset_of_labor) %>% "
+"0","  filter(onset_of_labor!='Unknown') %>% "
+"0","  ggplot(aes(nature,fill=onset_of_labor))+"
+"0","  geom_bar()+"
+"0","  scale_fill_manual(values = color_pal)+"
+"0","  labs(x='')"

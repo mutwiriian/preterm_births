@@ -1,0 +1,8 @@
+"0","births %>% "
+"0","  count(birth_weight) %>% "
+"0","  ggplot(aes(x=birth_weight,y=n,fill=birth_weight))+"
+"0","  geom_col()+"
+"0","  geom_text(aes(label=n),vjust=-.6)+"
+"0","  scale_fill_manual(values = color_pal)+"
+"0","  ylim(c(0,90))+"
+"0","  labs(x='Birth Weight',y='Frequency')"

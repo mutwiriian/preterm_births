@@ -1,0 +1,7 @@
+"0","births %>% "
+"0","  select(mode_of_delivery,complication) %>% "
+"0","  tbl_summary(by=complication,"
+"0","              label = list(mode_of_delivery~'Mode of Delivery')) %>% "
+"0","  add_p() %>% "
+"0","  as_gt() %>% "
+"0","  tab_header(title = md('**Complication?**'))"

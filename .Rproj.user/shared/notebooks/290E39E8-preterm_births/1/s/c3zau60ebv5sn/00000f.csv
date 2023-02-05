@@ -1,0 +1,8 @@
+"0","births %>% "
+"0","  select(nature,onset_of_labor) %>% "
+"0","  na.omit() %>% "
+"0","  ggplot(aes(onset_of_labor))+"
+"0","  geom_bar(aes(fill=onset_of_labor),show.legend = F)+"
+"0","  scale_fill_manual(values = color_pal)+"
+"0","  facet_wrap(~nature)+"
+"0","  labs(x='Onset of labor')"

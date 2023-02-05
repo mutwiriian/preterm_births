@@ -1,0 +1,4 @@
+"0","births %>% "
+"0","  select(nature,birth_weight) %>% "
+"0","  tbl_summary(by=nature,label=list(birth_weight='Birth Weight')) %>% "
+"0","  add_p()"

@@ -1,0 +1,5 @@
+"0","births %>% "
+"0","  select(nature,mother_age) %>% "
+"0","  ggplot(aes(mother_age,fill=nature)) +"
+"0","  geom_density(alpha=.5)+"
+"0","  scale_fill_manual(values = color_pal)"

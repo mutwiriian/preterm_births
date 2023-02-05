@@ -1,0 +1,4 @@
+"0","births %>% "
+"0","  ggplot(aes(gestational_age))+"
+"0","  geom_histogram(bins=10,fill='midnightblue',color='white')+"
+"0","  labs(x='Gestational age',y='Frequency')"

@@ -1,0 +1,5 @@
+"0","births %>% "
+"0","  select(mode_of_delivery,nature) %>% "
+"0","  tbl_summary(by=nature,"
+"0","              label = list(mode_of_delivery~'Mode of Delivery')) %>% "
+"0","  add_p()"

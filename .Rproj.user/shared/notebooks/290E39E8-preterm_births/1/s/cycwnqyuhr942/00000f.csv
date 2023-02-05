@@ -1,0 +1,7 @@
+"0","ttt_ifas %>% "
+"0","  mutate(Hb=as.numeric(Hb))%>% "
+"0","  summarise(N=n(),"
+"0","            Average=mean(Hb,na.rm=T)) %>% "
+"0","  gt() %>% "
+"0","  tab_header(title = 'Hb levels reported')"
+"2","Warning: NAs introduced by coercion"

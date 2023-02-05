@@ -1,0 +1,4 @@
+"0","births %>% "
+"0","  ggplot(aes(mother_age)) +"
+"0","  geom_histogram(bins = 20,fill='midnightblue',color='white')+"
+"0","  labs(x=""Mother's age"",y='Count',title = ""Histogram of mothers' age"")"

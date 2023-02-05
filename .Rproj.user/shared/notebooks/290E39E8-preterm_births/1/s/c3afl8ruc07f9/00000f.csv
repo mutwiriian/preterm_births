@@ -1,0 +1,5 @@
+"0","births %>% "
+"0","  ggplot(aes(nature,fill=sex))+"
+"0","  geom_bar()+"
+"0","  scale_fill_manual(values = color_pal)+"
+"0","  labs(x='',y='Count')"

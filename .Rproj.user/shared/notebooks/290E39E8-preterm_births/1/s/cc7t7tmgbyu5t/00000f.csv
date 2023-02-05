@@ -1,0 +1,2 @@
+"0","ttt_ifas <- readxl::read_xlsx('factors.xlsx') %>% "
+"0","  select('Tetanus Toxoid','IFAS','Hb')"

@@ -1,0 +1,8 @@
+"0","births %>% "
+"0","  group_by(nature,occupation) %>% "
+"0","  ggplot(aes(occupation,fill=occupation))+"
+"0","  geom_bar(show.legend = F)+"
+"0","  scale_fill_manual(values = color_pal)+"
+"0","  coord_flip()+"
+"0","  facet_wrap(~nature)+"
+"0","  labs(y='Count',x='Occupation')"

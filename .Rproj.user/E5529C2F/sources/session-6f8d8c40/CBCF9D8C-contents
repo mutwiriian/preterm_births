@@ -1,0 +1,342 @@
+---
+title: "Embu Research Results"
+author: 'Yatich Kore, MBChB'
+format: pdf
+editor: visual
+date: now
+---
+
+```{r cache=TRUE}
+#| echo: false
+#| warning: false
+#| message: false
+library(tidyverse)
+
+embu_results<- readxl::read_xlsx('embu_results.xlsx') %>% 
+  group_by(factor_category) %>% 
+  mutate(score=(3*strongly_agree)+(2*agree)+disagree) %>% 
+  ungroup()
+
+colors <- viridis::viridis_pal(option = 'E')(6)
+
+```
+
+```{r cache=TRUE}
+#| echo: false
+gender <- tibble(sex=c('Male','Female'),
+       count=c(23,33))
+
+gender %>% 
+  ggplot(aes(sex,count,fill=sex))+
+  geom_col(show.legend = F)+
+  geom_text(aes(sex,count,label=count),vjust=-.5,fontface='bold')+
+  ylim(c(0,40))+
+  scale_fill_manual(values = colors)+
+  labs(x='',y='Count',title = 'More men than women interviewed')+
+  theme_bw()+
+  theme(axis.text = element_text(size = 12))
+
+```
+
+```{r cache=TRUE}
+#| echo: false
+age_groups <- tibble(age_group=factor(c('<30','30-40','>40'),
+                                      levels = c('<30','30-40','>40')),
+       count=c(17,14,25))
+
+age_groups %>% 
+  ggplot(aes(age_group,count,fill=age_group))+
+  geom_col(show.legend = F)+
+  geom_text(aes(age_group,count,label=count),vjust=-.5,fontface='bold')+
+  ylim(c(0,30))+
+  scale_fill_manual(values = colors)+
+  labs(x='Age',y='Frequency',title = 'Age profile of hospital staff')+
+  theme_bw()+
+  theme(axis.text = element_text(size = 12))
+
+```
+
+```{r cache=TRUE}
+#| echo: false #10,6 docx
+#| fig-width: 8
+#| fig-height: 4
+department <- tibble(dept=c('Reproductive health',
+                            'Surgery',
+                            'Pediatric',
+                            'Medical and psychiatry',
+                            'Lab and pharmacy'),
+                     count=c(16,7, 13,9,11))
+
+department %>% 
+  ggplot(aes(count,reorder(dept,count),fill=dept))+
+  geom_col(show.legend = F)+
+  geom_text(aes(label=count),hjust=-.3,fontface='bold')+
+  scale_fill_manual(values = colors)+
+  labs(x='Counts',y='',title = 'Distribution across departments')+
+  theme_bw()+
+  theme(axis.text = element_text(size = 12))
+
+```
+
+```{r cache=TRUE}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 4
+education=tibble(level=factor(c('Diploma','Higher diploma','Degree','Masters')),
+                 count=c(14,16,23,3))
+
+education %>% 
+  ggplot(aes(count,reorder(level,count),fill=level))+
+  geom_col(show.legend = F)+
+  geom_text(aes(label=count),fontface='bold',hjust=-.3)+
+  scale_fill_manual(values = colors)+
+  labs(x='Count',y='',title = 'Educational achievement of staff')+
+  theme_bw()+
+  theme(axis.text = element_text(size = 12))
+
+```
+
+```{r cache=TRUE}
+#| echo: false
+practice <- tibble(
+  level=factor(c('<1yr','1-5','5-10','10-15','15-20','>20'),
+  levels = c('<1yr','1-5','5-10','10-15','15-20','>20')),
+  count=c(12,19,9,6,7,3))
+
+practice %>% 
+  ggplot(aes(level,count,fill=level))+
+  geom_col(show.legend = F)+
+  geom_text(aes(label=count),vjust=-.3,fontface='bold')+
+  scale_fill_manual(values = colors)+
+  ylim(c(0,20))+
+  labs(x='Years',y='Frequency',title='Years of practice of hospital staff')+
+  theme_bw()+
+  theme(axis.text = element_text(size = 12))
+```
+
+For the motivational factors reported, good management support, resource availability and conducive conditions and recognition, appreciation and timely payment were the highly reported factors at **89%**,**86%** and **100%** respectively. Recognition, appreciation and timely payment,good management support and resource availability and conducive conditions had highest overall scores of **168**,**162** and **160** points respectively
+
+```{r cache=TRUE}
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8
+#| fig-height: 4
+motivational<- embu_results %>% 
+  filter(factor_category=='Motivational Factor') %>% 
+  pivot_longer(cols = 3:5,names_to = 'response',values_to = 'count') %>% 
+  select(-factor_category,-score) %>% 
+  group_by(factor) %>% 
+  mutate(prop=scales::percent(count/sum(count)),
+         response=factor(response,
+                         levels = c('disagree','agree','strongly_agree'),
+                         labels = c('Disagree','Agree','Strongly Agree')),
+         factor=str_replace_all(factor,' and '," and\n"))
+
+label_data_mot <- read_csv('label_data_mot.csv')
+
+#For the motivational factors reported, good management support, resource 
+#availability and conducive conditions and ,surprisingly,  were the highly reported at 89%,86% and 
+#100% respectively.
+motivational%>% 
+  ggplot(aes(count,factor))+
+    geom_col(aes(fill=response))+
+  geom_text(data = label_data_mot,
+            aes(x=count,y=factor,label=prop),col='white',fontface='bold')+
+  scale_x_continuous(breaks = seq(0,70,10))+
+  scale_fill_manual(values = colors)+
+  guides(fill=guide_legend(reverse = T))+
+  labs(y='',x='')+
+  theme_bw()+
+  theme(
+    axis.text = element_text(size = 12),
+    legend.position = 'top',
+    legend.title = element_blank(),
+    legend.box.spacing = unit(.01,'cm'),
+    #legend.key.width = unit(.8,'cm'),
+    #legend.key.size  =unit(.7,'cm')
+    legend.spacing.x = unit(.5,'cm'),
+    legend.text = element_text(size = 12)
+  )
+
+```
+
+Recognition, appreciation and timely payment,good management support and resource availability and conducive conditions had highest overall scores of **168**,**162** and **160** points respectively
+
+```{r cache=TRUE}
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8
+#| fig-height: 4
+motivational_score<- embu_results %>% 
+  filter(factor_category=='Motivational Factor') %>% 
+  mutate(factor=str_replace_all(factor,' and '," and\n")) %>%
+  select(factor,score)
+
+motivational_score %>% 
+  ggplot(aes(score,reorder(factor,score)))+
+  geom_col(aes(fill=factor),show.legend = F)+
+  geom_text(aes(label=score),fontface='bold',hjust=-.3)+
+  scale_fill_manual(values = colors)+
+  xlim(c(0,200))+
+  labs(x='',y='',title = 'Overall score of motivational factors')+
+  theme_bw()+
+  theme(axis.text = element_text(size = 12))
+```
+
+Inadequate recognition, appreciation and delayed payment and difficult working conditions were the most frequently reported as the major factors causing de-motivation among hospital staff interviewed.
+
+```{r cache=TRUE}
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8
+#| fig-height: 4
+demotivating <- embu_results %>% 
+  filter(factor_category=='Demotivating factors') %>% 
+  pivot_longer(cols = 3:5,names_to = 'response',values_to = 'count') %>% 
+  select(-factor_category,-score) %>% 
+  group_by(factor) %>% 
+  mutate(prop=count/sum(count),
+         pct=scales::percent(count/sum(count)),
+         response=factor(response,
+                         levels = c('disagree','agree','strongly_agree'),
+                         labels = c('Disagree','Agree','Strongly Agree')),
+         factor= str_replace_all(factor,' and',"\n and "))
+
+label_data_demot <- read_csv('label_data_demot.csv')   
+  
+#Inadequate recognition, appreciation and delayed payment and difficult 
+#working conditions were the most frequently reported as the major factors causing #
+#de-motivation among hospital staff interviewed. Majority(94.6%) of staff strongly 
+#cite de-motivation by difficult working conditions with an overall score of 165 points.
+#All staff agree to inadequate recognition, appreciation and delayed payment as 
+#de-motivating factor with an overall score of 168 points.
+demotivating%>% 
+  ggplot(aes(count,factor))+
+  geom_col(aes(fill=response)) +
+  geom_text(data = label_data_demot,aes(label=pct),
+            color='white',fontface='bold')+
+  guides(fill=guide_legend(reverse = T))+
+  scale_x_continuous(breaks = seq(0,70,10))+
+  scale_fill_manual(values = colors)+
+  labs(y='',x='')+
+  theme_bw()+
+  theme(
+    axis.text = element_text(size = 12),
+    axis.line.y = element_line(linetype='blank'),
+    legend.position = 'top',
+    legend.title = element_blank(),
+    legend.box.spacing = unit(.01,'cm'),
+    #legend.key.width = unit(.8,'cm'),
+    #legend.key.size  =unit(.7,'cm')
+    legend.spacing.x = unit(.5,'cm'),
+    legend.text = element_text(size = 12)
+  )
+```
+
+Majority(**94.6%**) of staff strongly cite de-motivation by difficult working conditions with an overall score of **165** points. All staff agree to inadequate recognition, appreciation and delayed payment as de-motivating factor with an overall score of **168** points.
+
+```{r cache=TRUE}
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8
+#| fig-height: 4
+demotivating_score<- embu_results %>% 
+  filter(factor_category=='Demotivating factors') %>% 
+  mutate(factor=str_replace_all(factor,' and '," and\n")) %>% 
+  select(factor,score)
+
+demotivating_score %>% 
+  ggplot(aes(score,reorder(factor,score)))+
+  geom_col(aes(fill=factor),show.legend = F)+
+  geom_text(aes(label=score),fontface='bold',hjust=-.3)+
+  scale_fill_manual(values = colors)+
+  xlim(c(0,200))+
+  labs(x='',y='',title = 'Overall score by factor')+
+  theme_bw()+
+  theme(axis.text = element_text(size = 12))
+
+```
+
+There is more variability for factors related to work conditions compared to motivational and de-motivational factors. At least **90%** percent of of staff disagree on the availability of resources and conducive working conditions and appropriate recognition,appreciation and timely payment. **66%** percent agree on good administrative support while **42.9%** strongly agree on fair treatment currently at the hospital.
+
+```{r cache=TRUE}
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8
+#| fig-height: 4
+conditions<- embu_results %>% 
+  filter(factor_category=='Working conditions') %>% 
+  pivot_longer(cols = 3:5,names_to = 'response',values_to = 'count') %>% 
+  select(-factor_category,-score) %>% 
+  group_by(factor) %>% 
+  mutate(prop=count/sum(count),
+         pct=scales::percent(count/sum(count)),
+         response=factor(response,
+                         levels = c('disagree','agree','strongly_agree'),
+                         labels = c('Disagree','Agree','Strongly Agree')),
+         factor=str_replace_all(factor,"d c","d\nc"),
+         factor=str_replace_all(factor,"n and","n\nand"))
+
+label_data_conditions <- read_csv('label_data_conditions.csv')
+
+#There is more variability for factors related to work conditions compared to 
+#motivational and de-motivational factors. At least 90% percent of of staff disagree 
+#on the availability of resources and conducive working conditions 
+#and appropriate recognition,appreciation and timely payment. 66% percent agree 
+#on good administrative support   while 42.9% strongly agree on fair treatment 
+#currently at the hospital. The current status of welfare benefits and fair treatments 
+#had the highest overall score of 123 and 114 respectively
+conditions %>% 
+  ggplot(aes(count,factor)) +
+  geom_col(aes(fill=response)) +
+  geom_text(data = label_data_conditions,
+            aes(count,factor,label=pct),color='white',fontface='bold',
+            show.legend = F)+
+  guides(fill=guide_legend(reverse = T)) +
+  scale_x_continuous(breaks = seq(0,70,10))+
+  scale_fill_manual(values = colors)+
+  labs(y='',x='') +
+  theme_bw()+
+  theme(
+    axis.text = element_text(size = 12),
+    legend.position = 'top',
+    legend.title = element_blank(),
+    legend.box.spacing = unit(.01,'cm'),
+    #legend.key.width = unit(.8,'cm'),
+    #legend.key.size  =unit(.7,'cm')
+    legend.spacing.x = unit(.5,'cm'),
+    legend.text = element_text(size = 12)
+  )
+
+
+```
+
+The current status of welfare benefits and fair treatments had the highest overall score of **123** and **114** points respectively.
+
+```{r cache=TRUE}
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8
+#| fig-height: 4
+conditions_score <- embu_results %>% 
+  filter(factor_category=='Working conditions') %>% 
+  mutate(factor=str_replace_all(factor,' and '," and\n")) %>% 
+  select(factor,score)
+
+conditions_score%>% 
+  ggplot(aes(score,reorder(factor,score)))+
+  geom_col(aes(fill=factor),show.legend = F)+
+  geom_text(aes(label=score),fontface='bold',hjust=-.3)+
+  scale_fill_manual(values = colors)+
+  xlim(c(0,150))+
+  labs(x='',y='',title = 'Overall score based on current status')+
+  theme_bw()+
+  theme(axis.text = element_text(size = 12))
+
+```

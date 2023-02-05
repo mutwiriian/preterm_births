@@ -1,0 +1,6 @@
+"0","births %>% "
+"0","  select(nature,anc_visits) %>% "
+"0","  mutate(anc_visits=as_factor(anc_visits)) %>% "
+"0","  filter(anc_visits!='Unknown',nature!='Unknown') %>% "
+"0","  tbl_summary(by=nature,label=list(anc_visits='Clinic Visits')) %>% "
+"0","  add_p()"

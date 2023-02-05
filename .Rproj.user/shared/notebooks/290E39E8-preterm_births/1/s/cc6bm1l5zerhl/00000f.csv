@@ -1,0 +1,6 @@
+"0","#/ warning: false"
+"0","births %>% "
+"0","  ggplot(aes(marital_status))+"
+"0","  geom_bar(aes(fill=marital_status))+"
+"0","  scale_fill_manual(values = color_pal)+"
+"0","  labs(x='Marital Status',y='Count')"
